@@ -1,26 +1,31 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2017",
+    "lib": ["es2017"],
     "module": "commonjs",
+    "declaration": true,
     "moduleResolution": "node",
+    "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "jsx": "preserve",
-    "allowJs": true,
     "importHelpers": true,
-    "alwaysStrict": true,
-    "sourceMap": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitAny": false,
+    "noUnusedParameters": false,
     "noImplicitThis": false,
-    "strictNullChecks": false,
-    "declaration": true
+    "alwaysStrict": true
+    //"allowJs": true
+    //    "outDir":"lib"
+    //    "rootDir": "src",
+    //    "sourceMap": true
   },
   "include": [
-    "src/**/*",
-    "__tests__/**/*"
+    "./"
+    //    "__tests__/**/*"
+  ],
+  "exclude": [
+    "out",
+    "lib",
+    "node_modules",
+    "example"
   ]
 }
