@@ -26,6 +26,9 @@
     "test-only": "jest --coverage",
     "test:watch": "jest --watch"
   },
+  "environment": {
+    "local": {}
+  },
   "author": "Jakub Synowiec <github@jakubsynowiec.info>",
   "license": "MIT",
   "repository": {
@@ -37,19 +40,18 @@
   },
   "homepage": "https://github.com/jsynowiec/node-typescript-boilerplate#readme",
   "dependencies": {
-    "tslib": "~1.7.1",
     "axios": "^0.16.1",
+    "body-parser": "^1.18.2",
     "colors": "^1.1.2",
     "compression": "^1.6.2",
-    "connect": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.3",
     "dotenv": "^4.0.0",
+    "express": "^4.16.2",
     "helmet": "^3.8.1",
     "ioredis": "^3.1.4",
-    "js-yaml": "^3.3.0",
     "lodash": "^4.17.4",
     "mysql": "^2.13.0",
-    "swagger-tools": "0.10.1"
+    "tslib": "~1.7.1"
   }
 }
