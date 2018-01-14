@@ -2,12 +2,15 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as httpProxy from 'http-proxy';
 import * as fs from 'fs';
+import * as https from 'https';
+
+const ssl = {
+  key: fs.readFileSync('valid-ssl-key.pem', 'utf8'),
+  cert: fs.readFileSync('valid-ssl-cert.pem', 'utf8')
+};
 
 const options = {
-  ssl: {
-    key: fs.readFileSync('valid-ssl-key.pem', 'utf8'),
-    cert: fs.readFileSync('valid-ssl-cert.pem', 'utf8')
-  },
+  ssl,
   target: 'https://localhost:5000',
   secure: true // Depends on your needs, could be false.
 };
@@ -118,6 +121,10 @@ app.use((err, req, res, next) => {
   res.send(err.message);
 });
 
-app.listen(10010, function () {
-  console.log(`This server is running on the port ${this.address().port}`);
+// app.listen(10010, function () {
+//   console.log(`This server is running on the port ${this.address().port}`);
+// });
+
+https.createServer(ssl, app).listen(10010, function(){
+  console.log("Https server listening on port " + 10010);
 });
