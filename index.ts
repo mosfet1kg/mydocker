@@ -1,6 +1,18 @@
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as httpProxy from 'http-proxy';
+import * as fs from 'fs';
 
+const options = {
+  ssl: {
+    key: fs.readFileSync('valid-ssl-key.pem', 'utf8'),
+    cert: fs.readFileSync('valid-ssl-cert.pem', 'utf8')
+  },
+  target: 'https://localhost:5000',
+  secure: true // Depends on your needs, could be false.
+};
+
+const proxy = httpProxy.createProxyServer(options); // See (†)
 const app = express();
 const v2Router = express.Router();
 
@@ -21,10 +33,7 @@ v2Router.route('/')
     // 200
     // 401
     // 404
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: '/'}));
+    proxy.web(req, res);
   });
 
 v2Router.route('/*/manifests/:reference')
@@ -38,9 +47,7 @@ v2Router.route('/*/manifests/:reference')
 
     console.log( name, reference );
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: 'GET /*/manifests/*'}));
+    proxy.web(req, res);
   });
 
 v2Router.route('/*/blob/uploads/:uuid')
@@ -54,9 +61,7 @@ v2Router.route('/*/blob/uploads/:uuid')
 
     console.log( name, uuid );
 
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: 'GET /*/blob/uploads/*'}));
+    proxy.web(req, res);
   });
 
 v2Router.route('/*/blob/:digest')
@@ -70,9 +75,7 @@ v2Router.route('/*/blob/:digest')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: 'GET /*/blob/<digest>'}));
+    proxy.web(req, res);
   });
 
 v2Router.route('/_catalog')
@@ -85,9 +88,7 @@ v2Router.route('/_catalog')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: 'GET /*/blob/<digest>'}));
+    proxy.web(req, res);
   });
 
 v2Router.route('/*/tags/list')
@@ -100,9 +101,7 @@ v2Router.route('/*/tags/list')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({message: 'GET /*/blob/<digest>'}));
+    proxy.web(req, res);
   });
 
 
