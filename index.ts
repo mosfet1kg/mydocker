@@ -3,11 +3,13 @@ import * as bodyParser from 'body-parser';
 import * as httpProxy from 'http-proxy';
 import * as fs from 'fs';
 
+const ssl = {
+  key: fs.readFileSync('/root/certs/privkey.pem', 'utf8'),
+  cert: fs.readFileSync('/root/certs/cert.pem', 'utf8')
+};
+
 const options = {
-  ssl: {
-    key: fs.readFileSync('valid-ssl-key.pem', 'utf8'),
-    cert: fs.readFileSync('valid-ssl-cert.pem', 'utf8')
-  },
+  ssl,
   target: 'https://localhost:5000',
   secure: true // Depends on your needs, could be false.
 };
@@ -21,6 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
+
+app.use('/', (req, res, next)=>{
+  next();
+});
 
 app.use('/v2', v2Router);
 
@@ -47,7 +53,7 @@ v2Router.route('/*/manifests/:reference')
 
     console.log( name, reference );
 
-    proxy.web(req, res);
+    proxy.web(req, res, options);
   });
 
 v2Router.route('/*/blob/uploads/:uuid')
@@ -61,7 +67,7 @@ v2Router.route('/*/blob/uploads/:uuid')
 
     console.log( name, uuid );
 
-    proxy.web(req, res);
+    proxy.web(req, res, options);
   });
 
 v2Router.route('/*/blob/:digest')
@@ -75,7 +81,7 @@ v2Router.route('/*/blob/:digest')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    proxy.web(req, res);
+    proxy.web(req, res, options);
   });
 
 v2Router.route('/_catalog')
@@ -88,7 +94,7 @@ v2Router.route('/_catalog')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    proxy.web(req, res);
+    proxy.web(req, res, options);
   });
 
 v2Router.route('/*/tags/list')
@@ -101,9 +107,8 @@ v2Router.route('/*/tags/list')
     const { ['0']: name, digest } = req.params;
     console.log( name, digest );
     console.log( req.params );
-    proxy.web(req, res);
+    proxy.web(req, res, options);
   });
-
 
 
 app.use((req, res, next) => {
