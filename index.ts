@@ -27,6 +27,8 @@ app.use(bodyParser.json());
 
 app.use((req, res, next) => {
   console.log( req.url );
+  console.log( req.connection.servername );
+  console.log( req.headers.host );
   req.credentials = auth(req);
   console.log( 'c1', req.credentials );
   next();
@@ -46,8 +48,9 @@ app.all('/v2/$', (req, res, next) => {
   console.log( 'c2', credentials );
   if (!credentials || credentials.name !== 'john' || credentials.pass !== 'secret') {
     res.statusCode = 401;
-    res.setHeader('WWW-Authenticate', 'Basic realm="example"');
-    res.end('Access denied')
+    res.setHeader('WWW-Authenticate', 'Basic realm="Access to the private docker registry"');
+    res.end('Access denied');
+    console.log('Access denied');
   } else {
     proxy.web(req, res, options);
   }
