@@ -53,7 +53,7 @@ app.all('/v2/$', (req, res, next) => {
 
 });
 
-app.all('/*/manifests/:reference', (req, res, next) => {
+app.all('/v2/*/manifests/:reference', (req, res, next) => {
   /**
    * PULLING AN IMAGE MANIFEST
    * GET /v2/<name>/manifests/<reference>
@@ -66,7 +66,7 @@ app.all('/*/manifests/:reference', (req, res, next) => {
   proxy.web(req, res, options);
 });
 
-app.all('/*/blob/uploads/:uuid', (req, res, next) => {
+app.all('/v2/*/blob/uploads/:uuid', (req, res, next) => {
   /**
    * PUSHING A LAYER
    * POST /v2/<name>/blobs/uploads/
@@ -79,7 +79,7 @@ app.all('/*/blob/uploads/:uuid', (req, res, next) => {
   proxy.web(req, res, options);
 });
 
-app.all('/*/blob/:digest', (req, res, next) => {
+app.all('/v2/*/blob/:digest', (req, res, next) => {
   /**
    * PULLING A LAYER : GET /v2/<name>/blobs/<digest>
    * Existing Layers : HEAD /v2/<name>/blobs/<digest>
@@ -92,7 +92,7 @@ app.all('/*/blob/:digest', (req, res, next) => {
   proxy.web(req, res, options);
 });
 
-app.all('/_catalog', (req, res, next) => {
+app.all('/v2/_catalog', (req, res, next) => {
   /**
    * Listing Repositories : GET /v2/_catalog
    *
@@ -104,7 +104,7 @@ app.all('/_catalog', (req, res, next) => {
   proxy.web(req, res, options);
 });
 
-app.all('/*/tags/list', (req, res, next) => {
+app.all('/v2/*/tags/list', (req, res, next) => {
   /**
    * Listing Repositories : GET /v2/_catalog
    *
