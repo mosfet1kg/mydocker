@@ -26,8 +26,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
+  console.log( req.url );
   req.credentials = auth(req);
-
+  console.log( 'c1', req.credentials );
   next();
 });
 
@@ -42,10 +43,10 @@ app.all('/v2/$', (req, res, next) => {
   // 404
 
   const { credentials } = req;
-  console.log( credentials );
+  console.log( 'c2', credentials );
   if (!credentials || credentials.name !== 'john' || credentials.pass !== 'secret') {
     res.statusCode = 401;
-    res.setHeader('WWW-Authenticate', 'Basic realm="example"')
+    res.setHeader('WWW-Authenticate', 'Basic realm="example"');
     res.end('Access denied')
   } else {
     proxy.web(req, res, options);
