@@ -3,6 +3,7 @@ import * as bodyParser from 'body-parser';
 import * as httpProxy from 'http-proxy';
 import * as fs from 'fs';
 import * as https from 'https';
+import * as auth from 'basic-auth';
 
 const ssl = {
   key: fs.readFileSync('/root/certs/privkey.pem', 'utf8'),
@@ -17,7 +18,6 @@ const options = {
 
 const proxy = httpProxy.createProxyServer(options); // See (†)
 const app = express();
-const v2Router = express.Router();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,95 +26,95 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use( (req, res, next) => {
-  console.log( req.url );
+  console.log( 'url: ', req.url );
   next();
 });
 
-app.use('/', (req, res, next)=>{
-  next();
+
+app.all('/v2/$', (req, res, next) => {
+  /**
+   * API Version Check
+   * GET /v2/
+   */
+
+  // 200
+  // 401
+  // 404
+
+  const credentials = auth(req);
+
+  if (!credentials || credentials.name !== 'john' || credentials.pass !== 'secret') {
+    res.statusCode = 401
+    res.setHeader('WWW-Authenticate', 'Basic realm="example"')
+    res.end('Access denied')
+  } else {
+    proxy.web(req, res, options);
+  }
+
 });
 
-app.use('/v2', v2Router);
+app.all('/*/manifests/:reference', (req, res, next) => {
+  /**
+   * PULLING AN IMAGE MANIFEST
+   * GET /v2/<name>/manifests/<reference>
+   */
 
-v2Router.route('/')
-  .get((req, res, next) => {
-    /**
-     * API Version Check
-     * GET /v2/
-     */
-    // 200
-    // 401
-    // 404
-    proxy.web(req, res);
-  });
+  const { ['0']: name, reference } = req.params;
 
-v2Router.route('/*/manifests/:reference')
-  .all( (req, res, next) => {
-    /**
-     * PULLING AN IMAGE MANIFEST
-     * GET /v2/<name>/manifests/<reference>
-     */
+  console.log( name, reference );
 
-    const { ['0']: name, reference } = req.params;
+  proxy.web(req, res, options);
+});
 
-    console.log( name, reference );
+app.all('/*/blob/uploads/:uuid', (req, res, next) => {
+  /**
+   * PUSHING A LAYER
+   * POST /v2/<name>/blobs/uploads/
+   */
 
-    proxy.web(req, res, options);
-  });
+  const { ['0']: name, uuid } = req.params;
 
-v2Router.route('/*/blob/uploads/:uuid')
-  .all( (req, res, next) => {
-    /**
-     * PUSHING A LAYER
-     * POST /v2/<name>/blobs/uploads/
-     */
+  console.log( name, uuid );
 
-    const { ['0']: name, uuid } = req.params;
+  proxy.web(req, res, options);
+});
 
-    console.log( name, uuid );
+app.all('/*/blob/:digest', (req, res, next) => {
+  /**
+   * PULLING A LAYER : GET /v2/<name>/blobs/<digest>
+   * Existing Layers : HEAD /v2/<name>/blobs/<digest>
+   *
+   */
 
-    proxy.web(req, res, options);
-  });
+  const { ['0']: name, digest } = req.params;
+  console.log( name, digest );
+  console.log( req.params );
+  proxy.web(req, res, options);
+});
 
-v2Router.route('/*/blob/:digest')
-  .all( (req, res, next) => {
-    /**
-     * PULLING A LAYER : GET /v2/<name>/blobs/<digest>
-     * Existing Layers : HEAD /v2/<name>/blobs/<digest>
-     *
-     */
+app.all('/_catalog', (req, res, next) => {
+  /**
+   * Listing Repositories : GET /v2/_catalog
+   *
+   */
 
-    const { ['0']: name, digest } = req.params;
-    console.log( name, digest );
-    console.log( req.params );
-    proxy.web(req, res, options);
-  });
+  const { ['0']: name, digest } = req.params;
+  console.log( name, digest );
+  console.log( req.params );
+  proxy.web(req, res, options);
+});
 
-v2Router.route('/_catalog')
-  .all( (req, res, next) => {
-    /**
-     * Listing Repositories : GET /v2/_catalog
-     *
-     */
+app.all('/*/tags/list', (req, res, next) => {
+  /**
+   * Listing Repositories : GET /v2/_catalog
+   *
+   */
 
-    const { ['0']: name, digest } = req.params;
-    console.log( name, digest );
-    console.log( req.params );
-    proxy.web(req, res, options);
-  });
-
-v2Router.route('/*/tags/list')
-  .all( (req, res, next) => {
-    /**
-     * Listing Repositories : GET /v2/_catalog
-     *
-     */
-
-    const { ['0']: name, digest } = req.params;
-    console.log( name, digest );
-    console.log( req.params );
-    proxy.web(req, res, options);
-  });
+  const { ['0']: name, digest } = req.params;
+  console.log( name, digest );
+  console.log( req.params );
+  proxy.web(req, res, options);
+});
 
 
 app.use((req, res, next) => {
