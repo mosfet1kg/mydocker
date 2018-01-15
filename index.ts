@@ -5,11 +5,6 @@ import * as fs from 'fs';
 import * as https from 'https';
 
 const ssl = {
-  key: fs.readFileSync('valid-ssl-key.pem', 'utf8'),
-  cert: fs.readFileSync('valid-ssl-cert.pem', 'utf8')
-};
-
-const ssl = {
   key: fs.readFileSync('/root/certs/privkey.pem', 'utf8'),
   cert: fs.readFileSync('/root/certs/cert.pem', 'utf8')
 };
