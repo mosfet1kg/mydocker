@@ -66,6 +66,8 @@ app.all('/v2/*/manifests/:reference', (req, res, next) => {
    * GET /v2/<name>/manifests/<reference>
    */
 
+  console.log( auth(req) );
+
   const { ['0']: name, reference } = req.params;
 
   console.log( name, reference );
