@@ -26,9 +26,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-  console.log( req.url );
-  console.log( req.connection.servername );
+  console.log( req.url, req.method, req.statusCode, req.statusMessage  );
+  // console.log( req.connection.servername );
+  // console.log( req.client.server.sessionIdContext );
+
   console.log( req.headers.host );
+
   req.credentials = auth(req);
   console.log( 'c1', req.credentials );
   next();
